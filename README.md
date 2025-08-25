@@ -1,70 +1,94 @@
-# Getting Started with Create React App
+# Revolt Motors Voice Assistant – Frontend
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+This is the frontend for the **Revolt Motors Voice Assistant**. It connects to the backend via WebSocket, streams microphone input in real-time, and plays back Gemini AI-generated audio responses.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## Features
 
-### `npm start`
+- Live microphone input (captured via Web Audio API)
+- Real-time audio streaming to backend (16kHz PCM)
+- AI audio + text responses streamed back from Gemini (24kHz PCM)
+- Text display of AI messages
+- Audio playback using `AudioContext`
+- Supports interruption – allows you to speak over the assistant
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Folder Structure
 
-### `npm test`
+frontend/
+├── public/
+│ └── worklet.js # AudioWorkletProcessor for mic capture
+├── src/
+│ └── App.js # Main React component
+│ └── index.js # React entry point
+├── package.json # Project configuration and dependencies
+├── package-lock.json # Lock file for reproducible installs
+├── README.md # This documentation file
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-### `npm run build`
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+---
 
-### `npm run eject`
+## Prerequisites
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+- Node.js v16 or later
+- A running backend WebSocket server (see `../backend/README.md`)
+  - Default backend WebSocket URL: `ws://localhost:5000/live`
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+---
+Running the App
+npm start
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Open your browser at:
+http://localhost:3000
 
-## Learn More
+Usage
+1. Click Connect
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+This initializes:
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Microphone capture (ask for permission)
 
-### Code Splitting
+WebSocket connection to the backend
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+Audio streaming begins
 
-### Analyzing the Bundle Size
+2. Speak into your mic
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+Your voice is streamed in real time to the backend Gemini API.
 
-### Making a Progressive Web App
+3. Listen to AI reply
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Gemini responds with both text and audio, which is played back in your browser.
 
-### Advanced Configuration
+4. Interrupt
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+You can speak again before the AI finishes — it will stop and respond to your new input.
 
-### Deployment
+5. Click End Call to disconnect
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+This stops the audio stream, closes the WebSocket, and resets the app.
 
-### `npm run build` fails to minify
+Audio Notes
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
+Capture Audio:
+Uses AudioWorklet to stream mic audio in 16kHz chunks (100ms each)
+
+Playback Audio:
+Gemini returns base64-encoded 16-bit PCM audio at 24kHz, converted and played using Web Audio API
+
+Known Issues
+
+Audio playback clarity depends on device microphone and network conditions.
+
+If Gemini quota is exceeded or model is unavailable, backend will close the connection.
+
+Frontend does not currently show loading or error states.
+
+
+
